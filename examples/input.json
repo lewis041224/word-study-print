@@ -1,0 +1,148 @@
+{
+  "settings": {
+    "version": "小学",
+    "new_per_day": 4,
+    "spaced": true,
+    "offsets": [
+      1,
+      3
+    ],
+    "surprise": false,
+    "translation_pos_hint": true,
+    "preserve_source_order": true
+  },
+  "entries": [
+    {
+      "word": "apple",
+      "meaning": "苹果",
+      "pos": "n.",
+      "unit": "Unit 1",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 0,
+      "order": 0
+    },
+    {
+      "word": "banana",
+      "meaning": "香蕉",
+      "pos": "n.",
+      "unit": "Unit 1",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 0,
+      "order": 1
+    },
+    {
+      "word": "book",
+      "meaning": "书",
+      "pos": "n.",
+      "unit": "Unit 1",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 0,
+      "order": 2
+    },
+    {
+      "word": "desk",
+      "meaning": "书桌",
+      "pos": "n.",
+      "unit": "Unit 1",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 0,
+      "order": 3
+    },
+    {
+      "word": "read",
+      "meaning": "阅读",
+      "pos": "v.",
+      "unit": "Unit 2",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 1,
+      "order": 4
+    },
+    {
+      "word": "write",
+      "meaning": "写",
+      "pos": "v.",
+      "unit": "Unit 2",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 1,
+      "order": 5
+    },
+    {
+      "word": "happy",
+      "meaning": "高兴的",
+      "pos": "adj.",
+      "unit": "Unit 2",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 1,
+      "order": 6
+    },
+    {
+      "word": "blue",
+      "meaning": "蓝色的",
+      "pos": "adj.",
+      "unit": "Unit 2",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 1,
+      "order": 7
+    },
+    {
+      "word": "water",
+      "meaning": "水",
+      "pos": "n.",
+      "unit": "Unit 3",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 2,
+      "order": 8
+    },
+    {
+      "word": "milk",
+      "meaning": "牛奶",
+      "pos": "n.",
+      "unit": "Unit 3",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 2,
+      "order": 9
+    },
+    {
+      "word": "school",
+      "meaning": "学校",
+      "pos": "n.",
+      "unit": "Unit 3",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 2,
+      "order": 10
+    },
+    {
+      "word": "teacher",
+      "meaning": "教师",
+      "pos": "n.",
+      "unit": "Unit 3",
+      "book": "自编示例",
+      "source": "本项目自编示例",
+      "reviewed": true,
+      "group_order": 2,
+      "order": 11
+    }
+  ]
+}
