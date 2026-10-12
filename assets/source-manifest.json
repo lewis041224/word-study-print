@@ -1,0 +1,28 @@
+{
+  "date": "2026-10-12",
+  "files": [
+    {
+      "filename": "4.普通高中英语课程标准（2017年版2020年修订）.pdf",
+      "sha256": "8ebd6bb12e9eb1c58e422ee01b540a4a71d2e681a4c4a764a36ee3a34b21c1be",
+      "bytes": 7750611
+    },
+    {
+      "filename": "《全国大学英语四、六级考试大纲（2016年修订版）》.pdf",
+      "sha256": "9166d3c03b7bc43abd9d9df91bd2ef8085b4419286f1e5ca100dea68f3cfd1f1",
+      "bytes": 12070155
+    },
+    {
+      "filename": "小初.pdf",
+      "sha256": "59ec3971e0dbd6ca487c4e4972cbc80effaf2fd62418d07e5f62c6698fa222fb",
+      "bytes": 31502213
+    },
+    {
+      "filename": "考研英语大纲词汇5500最新(完美打印版).pdf",
+      "sha256": "14f4fb312302dc83319280c8b5de623ae2103daac6411efde3ee9e97e3d051df",
+      "bytes": 1697146
+    }
+  ],
+  "raw_pdfs_included": false,
+  "compulsory_high_cet": "Byte-identical to prior official sources; local filenames recorded without user paths",
+  "netem": "User states personal compilation; author and authorization unknown; only English headwords extracted"
+}

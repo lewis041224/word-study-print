@@ -34,7 +34,9 @@ def settings(raw):
     cfg.update(raw or {})
     cfg['version'] = {'默认版': '大学', '小学版': '小学', '中学版': '初中', '中学': '初中',
                       '大学版': '大学', '高中版': '高中', '初中版': '初中',
-                      'CET4': '四级', 'CET6': '六级', '考研版': '考研'}.get(cfg['version'], cfg['version'])
+                      '四级': '四六级', '六级': '四六级', '四级版': '四六级', '六级版': '四六级',
+                      '四六级版': '四六级', 'CET4': '四六级', 'CET6': '四六级', 'CET': '四六级',
+                      '考研版': '考研'}.get(cfg['version'], cfg['version'])
     catalog = read(ROOT / 'assets/book-catalog.json')
     selected = next((b for b in catalog['books'] if cfg['version'] in (b['stage'], b['id'])), None)
     if selected:
@@ -43,7 +45,7 @@ def settings(raw):
     elif cfg['version'] in ('大学', '通用小学', '通用中学', '通用大学'):
         cfg['book_metadata'] = dict(name='通用精选兼容版', stage=cfg['version'], is_official_syllabus=False)
     else:
-        raise ValueError('请选择小学、初中、高中、四级、六级、考研或通用小学/通用中学/通用大学（大学为旧默认兼容版）')
+        raise ValueError('请选择小学、初中、高中、四六级、考研或通用小学/通用中学/通用大学（大学为旧默认兼容版）')
     for field in ('new_per_day', 'surprise_count', 'unit_days'):
         if not isinstance(cfg[field], int) or isinstance(cfg[field], bool) or cfg[field] < 1:
             raise ValueError(field + ' 必须为正整数')
@@ -63,6 +65,7 @@ def settings(raw):
 
 def dictionary(version='大学'):
     catalog = read(ROOT / 'assets/book-catalog.json')
+    version = catalog.get('aliases', {}).get(version, version)
     selected = next((b for b in catalog['books'] if version in (b['stage'], b['id'])), None)
     if selected:
         data = read(ROOT / 'assets' / selected['file'])
@@ -325,7 +328,8 @@ def main():
                          book=print_title, source='内置词库：' + print_title, builtin=True, reviewed=False, order=i)
                 if item.get('print_pos'):
                     e['pos'] = item['print_pos']
-                for field in ('aliases', 'source_raw', 'source_row', 'source_sense', 'pdf_page', 'translation_source'):
+                for field in ('aliases', 'source_raw', 'source_row', 'source_sense', 'pdf_page', 'translation_source',
+                              'level', 'derived', 'source_sha256', 'word_source_id'):
                     if field in item:
                         e[field] = copy.deepcopy(item[field])
                 entries.append(e)

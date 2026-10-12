@@ -20,7 +20,7 @@
 }
 ```
 
-`mode` 为 count 或 unit；单元模式 unit_days 只支持1或2。`version` 可写小学、初中、高中、四级、六级、考研；中学/中学版映射初中。大学/大学版/默认版仍是旧3500通用版。旧通用范围明确写通用小学、通用中学、通用大学。也支持 book-catalog.json 的书目 id、CET4/CET6。settings.book_metadata 保存实际版本、来源、授权和核对状态。`output_mode` 为 combined（日集中汇总）、daily（逐日）或 memory（整本纯记忆）。combined/daily 均按当天中英对照、中译英、英译中、一页反馈表排列后进入下一天。`days` 为 `3`、`3-5`、`1,3,5-7`，使用原计划天号。`start_date` 为 YYYY-MM-DD；null 使用第1天。复习开关 spaced=true；offsets 是学习日起的正整数偏移。seed 修改可重抽随机旧词。
+`mode` 为 count 或 unit；单元模式 unit_days 只支持1或2。`version` 可写小学、初中、高中、四六级、考研；中学/中学版映射初中。大学/大学版/默认版仍是旧3500通用版。旧通用范围明确写通用小学、通用中学、通用大学。也支持 book-catalog.json 的书目 id、CET4/CET6。settings.book_metadata 保存实际版本、来源、授权和核对状态。`output_mode` 为 combined（日集中汇总）、daily（逐日）或 memory（整本纯记忆）。combined/daily 均按当天中英对照、中译英、英译中、一页反馈表排列后进入下一天。`days` 为 `3`、`3-5`、`1,3,5-7`，使用原计划天号。`start_date` 为 YYYY-MM-DD；null 使用第1天。复习开关 spaced=true；offsets 是学习日起的正整数偏移。seed 修改可重抽随机旧词。
 
 `group_order` 是 Codex 阅读后确认的单元/来源组顺序；`order` 为组内顺序。缺省时保持输入次序；自然排序不能替代正文判断。同一本书同一单元使用同一 group_order。无单元材料在 count 模式按来源组组织；unit 模式要求每项有单元。`meaning` 是最终打印的客户释义；缺省时从词库补充 `suggested_meaning`，需核对后赋值。`pos` 为单独的词性字段，默认只在中文侧显示；英译中默认位于右侧答题栏开头，translation_pos_hint=false 可不显示提示。可保留客户词性；源词库没有可靠独立词性字段，词性冲突由 Codex 核对。
 
