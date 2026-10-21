@@ -1,6 +1,6 @@
 interface:
   display_name: "背单词打印"
   short_description: "把图片和文档词汇整理为背单词练习，安排新学与复习并生成可打印的四部分 Word"
-  default_prompt: "使用 $word-study-print 整理我的词汇并生成可打印的背单词 Word。"
+  default_prompt: "读取本项目 SKILL.md，使用 Word Study Print 整理我的词汇并生成可打印的背单词 Word。"
 policy:
   allow_implicit_invocation: true
