@@ -1,6 +1,6 @@
 {
-  "updated": "2026-10-12",
-  "release_version": "2.0.0",
+  "updated": "2026-11-06",
+  "release_version": "3.1.0",
   "selection_policy": "purpose_and_source_before_count",
   "books": [
     {
@@ -80,87 +80,9 @@
       "source_type": "official_curriculum_or_exam_syllabus",
       "wordlist_rights": "Basic language facts; official administrative-document status considered under PRC Copyright Law article 5; no rights asserted over source PDF or publisher layout",
       "membership": "课标3000词；地方增加200词与应试3500词版分开"
-    },
-    {
-      "id": "cet-combined-syllabus-2016",
-      "stage": "四六级",
-      "name": "全国大学英语四六级合并词表（提取待核对版）",
-      "year": 2016,
-      "file": "books/cet-combined-syllabus-2016.json",
-      "source_filename": "《全国大学英语四、六级考试大纲（2016年修订版）》.pdf",
-      "source_sha256": "9166d3c03b7bc43abd9d9df91bd2ef8085b4419286f1e5ca100dea68f3cfd1f1",
-      "source_bytes": 12070155,
-      "imported_rows": 5377,
-      "unique_headwords": 5296,
-      "meanings_available": 5377,
-      "pos_available": 5377,
-      "updated": "2026-10-12",
-      "release_version": "2.0.0",
-      "status": "user_approved_membership_difference_pending",
-      "glossary_license": "ECDICT MIT + project independently drafted basic meanings MIT; retained upstream notice",
-      "glossary_review": "Automatic sense selection and AI-assisted basic definitions; user approved snapshot; not full human proofreading",
-      "membership_verification": "PDF coordinate extraction",
-      "warnings": [
-        "大纲标称5418，提取5377行，差41行仍待核对；不称已完整验证。",
-        "四级、六级调用名兼容映射到同一四六级合并词表，完整输出包含六级新增词。"
-      ],
-      "source_url": "https://cet.neea.edu.cn/res/Home/1704/55b02330ac17274664f06d9d3db8249d.pdf",
-      "downloaded_source_url": "https://cet.neea.edu.cn/res/Home/1704/55b02330ac17274664f06d9d3db8249d.pdf",
-      "source_type": "official_curriculum_or_exam_syllabus",
-      "wordlist_rights": "Basic language facts; official administrative-document status considered under PRC Copyright Law article 5; no rights asserted over source PDF or publisher layout",
-      "source_declared_combined_headwords": 5418,
-      "extracted_combined_rows": 5377,
-      "level_counts": {
-        "CET4": 4114,
-        "CET6": 1263
-      },
-      "membership": "Merged CET4 base and CET6 added headwords; original level and derived words retained; no count padding"
-    },
-    {
-      "id": "netem-personal-compilation",
-      "stage": "考研",
-      "name": "考研词汇个人整理版（来源待核对）",
-      "year": null,
-      "file": "books/netem-personal-compilation.json",
-      "source_filename": "考研英语大纲词汇5500最新(完美打印版).pdf",
-      "source_sha256": "14f4fb312302dc83319280c8b5de623ae2103daac6411efde3ee9e97e3d051df",
-      "source_bytes": 1697146,
-      "imported_rows": 5244,
-      "unique_headwords": 5241,
-      "meanings_available": 5244,
-      "pos_available": 5244,
-      "updated": "2026-10-12",
-      "release_version": "2.0.0",
-      "status": "user_approved_glossary_not_comprehensively_human_verified",
-      "glossary_license": "ECDICT MIT + project independently drafted basic meanings MIT; retained upstream notice",
-      "glossary_review": "Automatic sense selection and AI-assisted basic definitions; user approved snapshot; not full human proofreading",
-      "membership_verification": "43-page table extraction; independently matched all 5244 green word lines",
-      "warnings": [
-        "个人整理稿，作者、年份与选词编排授权未确认；不称官方最新版或已验证英语一/英语二词表。",
-        "文件名称5500，实际提取5244行/5241规范化词形；不补词凑数。"
-      ],
-      "source_url": null,
-      "source_type": "user_supplied_personal_compilation",
-      "wordlist_rights": "Author, year and permission of compilation unconfirmed; no blanket commercial authorization claimed",
-      "raw_chinese_definitions_imported": false
     }
   ],
-  "legacy": {
-    "name": "通用精选兼容版",
-    "ranges": {
-      "小学": 500,
-      "中学": 1500,
-      "大学": 3500
-    },
-    "is_official_syllabus": false
-  },
-  "aliases": {
-    "四级": "四六级",
-    "六级": "四六级",
-    "CET4": "四六级",
-    "CET6": "四六级",
-    "CET": "四六级"
-  },
+  "aliases": {},
   "conflict_policy": "customer_wins_chat_only",
   "import_date": "2026-10-12"
 }

@@ -43,6 +43,7 @@ def export_periods(plan, out, period_days=30, remainder_first=False, include_mem
         files.append(target)
     s = plan['settings']
     notes = [f'{title}，{len(plan["entries"])}条词汇，每天{s["new_per_day"]}个新词，复习另计。',
+             f'每页目标{s.get("words_per_page", 20)}词；长释义可能增加实际页数。',
              f'新学{plan["statistics"]["learning_days"]}天，全计划{len(plan["days"])}天。',
              f'间隔复习：{s["spaced"]}，学习后复习偏移：{s["offsets"]}天；随机旧词：{s["surprise"]}。',
              '每天中英对照、中译英、英译中、一页反馈表集中排列；词性在中文侧。',

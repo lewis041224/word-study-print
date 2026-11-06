@@ -5,7 +5,7 @@
 ```json
 {
   "settings": {
-    "version": "大学", "new_per_day": 20,
+    "version": "用户材料", "new_per_day": 20,
     "mode": "count", "unit_days": 1,
     "start_date": null, "spaced": false,
     "offsets": [1, 3, 7, 14],
@@ -20,7 +20,7 @@
 }
 ```
 
-`mode` 为 count 或 unit；单元模式 unit_days 只支持1或2。`version` 可写小学、初中、高中、四六级、考研；中学/中学版映射初中。大学/大学版/默认版仍是旧3500通用版。旧通用范围明确写通用小学、通用中学、通用大学。也支持 book-catalog.json 的书目 id、CET4/CET6。settings.book_metadata 保存实际版本、来源、授权和核对状态。`output_mode` 为 combined（日集中汇总）、daily（逐日）或 memory（整本纯记忆）。combined/daily 均按当天中英对照、中译英、英译中、一页反馈表排列后进入下一天。`days` 为 `3`、`3-5`、`1,3,5-7`，使用原计划天号。`start_date` 为 YYYY-MM-DD；null 使用第1天。复习开关 spaced=true；offsets 是学习日起的正整数偏移。seed 修改可重抽随机旧词。
+`mode`为count或unit，unit_days支持1或2。`version`仅支持小学、初中、高中，词源无默认；上传照片或指定用户材料时使用version="用户材料"（别名provided），不自动选内置学段，中学映射初中，旧大学/通用/四六级/考研调用名不再提供。output_mode支持combined、daily、memory和periods；days用于原计划日号筛选，start_date为空时为相对天数，spaced与offsets控制间隔复习。
 
 `group_order` 是宿主AI或使用者阅读后确认的单元/来源组顺序；`order` 为组内顺序。缺省时保持输入次序；自然排序不能替代正文判断。同一本书同一单元使用同一 group_order。无单元材料在 count 模式按来源组组织；unit 模式要求每项有单元。`meaning` 是最终打印的客户释义；缺省时从词库补充 `suggested_meaning`，需核对后赋值。`pos` 为单独的词性字段，默认只在中文侧显示；英译中默认位于右侧答题栏开头，translation_pos_hint=false 可不显示提示。客户词性优先；内置词性是候选，冲突由宿主AI或使用者结合语境核对。
 
@@ -52,3 +52,13 @@ output_mode另支持periods。命令行period-days控制期长，remainder-first
 prepare 的 conflicts 是候选差异：可能存在同义表达，需语义复核。工具按所选书的词目和原表拼写别名匹配，保留客户拼写；可疑拼写另由宿主AI或使用者查核，绝不自动替换客户词形。未确认的识别结果不进入准备好的词表。builtin 保留 source_raw、source_row、source_sense、pdf_page 和 aliases；原表分列的同形词以及 Miss/miss 不因空释义而合并。派生词不自动增加为主词目。
 
 build 会拒绝空释义/未核对的内置词条。plan.json 保存所有日子与随机选词，打印选择不会改变完整计划。会建立新目录并拒绝覆盖现有 Word/plan.json。个人学习进度与掌握程度不由本工具推断。
+
+## 环境与失败恢复
+
+先运行python scripts/study.py doctor。生成Word只需python-docx，读取PDF需pypdf，读取Excel需openpyxl；安装到doctor.executable对应的环境。build/reprint在临时目录完成后才交付；失败会清理本次临时产物，修复缺项后可使用原目标重试。已有成品目录不覆盖，改用新批次。异常断电或强制结束进程可能留下临时目录；不宣称能自动恢复所有崩溃。
+
+## 形式与体量
+
+words_per_page为1–20的每页目标词数，默认建议20，与new_per_day不同。spaced默认false，默认combined四部分按天排列。include_memory默认false；true时加整本总表。output_mode="memory"只生成总表，无练习空栏、复习重复或反馈表。period_days建议30，分期CLI --period-days优先于JSON设置。estimate input.json --mode memory等命令在生成前估算页数，不写Word。长释义、字体替换可能使实际页数增加。
+
+词源缺失时prepare/build会提示先选择，不回退小学。明确执行import-xlsx已选择用户文件，version默认为用户材料；builtin必须显式提供--version 小学/初中/高中。原计划reprint保留旧内容，不据此重新引入已删除词库。

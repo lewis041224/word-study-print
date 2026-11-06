@@ -27,7 +27,7 @@ def extract_excel(path):
 
 
 def import_pairs(path, pairs, sheet_name=None, start_row=2, numbered=False,
-                 pos_column=None, unit_column=None, version='大学'):
+                 pos_column=None, unit_column=None, version='用户材料'):
     from openpyxl import load_workbook
     from openpyxl.utils import column_index_from_string
     pair_columns = []

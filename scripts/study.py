@@ -1,4 +1,4 @@
-"""Deterministic printable vocabulary plans; OCR and semantic review belong to Codex."""
+"""Deterministic printable plans; photo recognition belongs to the host AI."""
 import argparse
 import copy
 import datetime as dt
@@ -9,10 +9,11 @@ import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-DEFAULTS = dict(version='大学', new_per_day=20, mode='count', unit_days=1,
+DEFAULTS = dict(version=None, new_per_day=20, mode='count', unit_days=1,
                 start_date=None, spaced=False, offsets=[1, 3, 7, 14],
                 surprise=False, surprise_count=5, seed=20261010,
-                output_mode='combined', days=None, translation_pos_hint=True)
+                output_mode='combined', days=None, translation_pos_hint=True,
+                words_per_page=20, period_days=30, include_memory=False)
 
 
 def read(path):
@@ -32,23 +33,25 @@ def norm(text):
 def settings(raw):
     cfg = copy.deepcopy(DEFAULTS)
     cfg.update(raw or {})
-    cfg['version'] = {'默认版': '大学', '小学版': '小学', '中学版': '初中', '中学': '初中',
-                      '大学版': '大学', '高中版': '高中', '初中版': '初中',
-                      '四级': '四六级', '六级': '四六级', '四级版': '四六级', '六级版': '四六级',
-                      '四六级版': '四六级', 'CET4': '四六级', 'CET6': '四六级', 'CET': '四六级',
-                      '考研版': '考研'}.get(cfg['version'], cfg['version'])
+    cfg['version'] = {'provided': '用户材料', '小学版': '小学', '中学版': '初中', '中学': '初中',
+                      '高中版': '高中', '初中版': '初中'}.get(cfg['version'], cfg['version'])
     catalog = read(ROOT / 'assets/book-catalog.json')
     selected = next((b for b in catalog['books'] if cfg['version'] in (b['stage'], b['id'])), None)
     if selected:
         cfg['version'] = selected['stage']
         cfg['book_metadata'] = copy.deepcopy(selected)
-    elif cfg['version'] in ('大学', '通用小学', '通用中学', '通用大学'):
-        cfg['book_metadata'] = dict(name='通用精选兼容版', stage=cfg['version'], is_official_syllabus=False)
+    elif cfg['version'] == '用户材料':
+        cfg['book_metadata'] = dict(name='用户提供的词汇材料', stage='用户材料', is_builtin=False)
     else:
-        raise ValueError('请选择小学、初中、高中、四六级、考研或通用小学/通用中学/通用大学（大学为旧默认兼容版）')
-    for field in ('new_per_day', 'surprise_count', 'unit_days'):
+        raise ValueError('请先选择词源：用户材料、小学、初中或高中；词源不设默认值。')
+    for field in ('new_per_day', 'surprise_count', 'unit_days', 'words_per_page', 'period_days'):
         if not isinstance(cfg[field], int) or isinstance(cfg[field], bool) or cfg[field] < 1:
             raise ValueError(field + ' 必须为正整数')
+    if cfg['words_per_page'] > 20:
+        raise ValueError('当前16pt书写版式每页目标词数为1–20；更多词数需要另行调整字体和版式。')
+    for field in ('spaced', 'surprise', 'include_memory', 'translation_pos_hint'):
+        if type(cfg[field]) is not bool:
+            raise ValueError(field + ' 必须为true或false')
     if cfg['mode'] not in ('count', 'unit') or cfg['unit_days'] not in (1, 2):
         raise ValueError('学习模式为 count/unit，单元天数为1或2')
     if cfg['output_mode'] not in ('combined', 'daily', 'memory', 'periods'):
@@ -63,7 +66,9 @@ def settings(raw):
     return cfg
 
 
-def dictionary(version='大学'):
+def dictionary(version=None):
+    if version in ('用户材料', 'provided'):
+        return dict(entries=[], ranges={})
     catalog = read(ROOT / 'assets/book-catalog.json')
     version = catalog.get('aliases', {}).get(version, version)
     selected = next((b for b in catalog['books'] if version in (b['stage'], b['id'])), None)
@@ -71,12 +76,28 @@ def dictionary(version='大学'):
         data = read(ROOT / 'assets' / selected['file'])
         data['ranges'] = {version: [e['normalized_word'] for e in data['entries']]}
         return data
-    data = read(ROOT / 'assets/vocabulary.json')
-    legacy = {'大学': '大学', '通用小学': '小学', '通用中学': '中学', '通用大学': '大学'}[version]
-    index = {e['normalized_word']: e for e in data['entries']}
-    data['entries'] = [index[w] for w in data['ranges'][legacy]]
-    data['ranges'] = {version: list(data['ranges'][legacy])}
-    return data
+    raise ValueError('内置词表仅支持小学、初中、高中')
+
+
+def start():
+    return dict(introduction='手机拍照或上传材料，由宿主AI识别整理后生成可下载DOCX；也可选择小初高内置词表。',
+                source_choices=['用户材料（拍照/上传）', '小学', '初中', '高中'],
+                source_default=None, output_choices=['四部分练习', '四部分练习＋整本总表', '只要整本总表'],
+                presets=dict(words_per_page=20, spaced=False, practice_parts=['中英对照', '中译英', '英译中', '反馈表'],
+                             new_per_day=20, period_days=30, include_memory=False),
+                ask=['选择词源', '每页目标词数1–20', '是否开启间隔复习', '汇总/逐日/分期及每期天数', '是否附总表或只要总表'],
+                requirements='宿主需支持图片视觉、Python执行和DOCX导出；普通GitHub浏览或纯文字聊天不足。',
+                note='这是首次使用说明，不自动选择词源、安装依赖或生成文档。具体平台是否在导入时显示它，由宿主决定。')
+
+
+def estimate(plan, mode, days=None, include_memory=False):
+    per_page = plan['settings'].get('words_per_page', 20)
+    selected = days if days is not None else plan['days']
+    memory_pages = math.ceil(len(plan['entries']) / per_page)
+    practice_pages = sum(3 * math.ceil(len(d['entries']) / per_page) + 1 for d in selected)
+    pages = memory_pages if mode == 'memory' else practice_pages + (memory_pages if include_memory else 0)
+    return dict(approximate_pages=pages, words_per_page=per_page,
+                note='按短释义及三种练习每页目标词数加每天一页反馈表估算；长释义、字体替换和软件分页可能增加实际页数。')
 
 
 def prepare(data):
@@ -239,6 +260,58 @@ def export(plan, out, expression=None, mode=None):
     return [str(out / name) for name, _ in files]
 
 
+def build_transaction(plan, args, mode):
+    """Generate in a private sibling directory; publish only complete outputs."""
+    import tempfile
+    import shutil
+    # Fail before creating output directories if the document runtime is unusable.
+    from print_layout import memory_document
+    target = Path(args.out).absolute()
+    zipped = target.with_name(target.name + '.zip')
+    if target.exists() or (args.zip and zipped.exists()):
+        raise ValueError('输出已存在，请使用新的批次目录')
+    if mode == 'periods' and (args.days or plan['settings'].get('days')):
+        raise ValueError('分期必须使用完整计划；选定天数请用combined或daily')
+    target.parent.mkdir(parents=True, exist_ok=True)
+    published = False
+    with tempfile.TemporaryDirectory(prefix='.word-study-', dir=target.parent) as temp:
+        staged = Path(temp) / 'result'
+        if mode == 'periods':
+            from batch_export import export_periods
+            files = export_periods(plan, staged, args.period_days or plan['settings'].get('period_days', 30), args.remainder_first,
+                                   args.include_memory, args.title)
+        else:
+            files = export(plan, staged, args.days, mode)
+            if args.include_memory and mode != 'memory':
+                extra = staged / '单词总版记忆表.docx'
+                memory_document(plan, extra)
+                files.append(str(extra))
+        names = [Path(f).name for f in files]
+        if args.zip:
+            from batch_export import zip_output
+            staged_zip = Path(zip_output(staged, files))
+        try:
+            # Never merge into a directory created by another task.
+            target.mkdir(exist_ok=False)
+            published = True
+            for item in staged.iterdir():
+                item.rename(target / item.name)
+            if args.zip:
+                with zipped.open('xb') as stream:
+                    try:
+                        with staged_zip.open('rb') as source:
+                            shutil.copyfileobj(source, stream)
+                    except BaseException:
+                        stream.close()
+                        zipped.unlink()
+                        raise
+        except BaseException:
+            if published:
+                shutil.rmtree(target)
+            raise
+    return [str(target / name) for name in names] + ([str(zipped)] if args.zip else [])
+
+
 def extract(path):
     path = Path(path)
     if path.suffix.lower() == '.xlsx':
@@ -268,6 +341,13 @@ def extract(path):
 def main():
     parser = argparse.ArgumentParser(description='背单词打印工具')
     sub = parser.add_subparsers(dest='command', required=True)
+    sub.add_parser('doctor', help='只读探测当前解释器、依赖与可用能力，不自动安装')
+    sub.add_parser('start', help='首次使用介绍及形式选择；不默认词源')
+    p = sub.add_parser('estimate', help='生成前估算页数，不写Word')
+    p.add_argument('input')
+    p.add_argument('--mode', choices=['combined', 'daily', 'memory', 'periods'])
+    p.add_argument('--days')
+    p.add_argument('--include-memory', action='store_true')
     p = sub.add_parser('books')
     p.add_argument('--out')
     for cmd in ('extract', 'prepare', 'build', 'reprint'):
@@ -277,7 +357,7 @@ def main():
         if cmd in ('build', 'reprint'):
             p.add_argument('--days')
             p.add_argument('--mode', choices=['combined', 'daily', 'memory', 'periods'])
-            p.add_argument('--period-days', type=int, default=30)
+            p.add_argument('--period-days', type=int)
             p.add_argument('--remainder-first', action='store_true')
             p.add_argument('--include-memory', action='store_true')
             p.add_argument('--title', default='单词')
@@ -290,15 +370,26 @@ def main():
     p.add_argument('--numbered', action='store_true')
     p.add_argument('--pos-column')
     p.add_argument('--unit-column')
-    p.add_argument('--version', default='大学')
+    p.add_argument('--version', default='用户材料')
     p.add_argument('--out', required=True)
     p = sub.add_parser('builtin')
-    p.add_argument('--version', default='大学')
+    p.add_argument('--version', required=True)
     p.add_argument('--limit', type=int)
     p.add_argument('--out', required=True)
     args = parser.parse_args()
     try:
-        if args.command == 'books':
+        if args.command == 'start':
+            print(json.dumps(start(), ensure_ascii=False, indent=2))
+        elif args.command == 'doctor':
+            from environment import doctor
+            print(json.dumps(doctor(), ensure_ascii=False, indent=2))
+        elif args.command == 'estimate':
+            data = read(args.input)
+            plan = data if isinstance(data.get('days'), list) else make_plan(data)
+            mode = args.mode or plan['settings']['output_mode']
+            print(json.dumps(estimate(plan, mode, select_days(plan, args.days),
+                                      args.include_memory or plan['settings'].get('include_memory', False)), ensure_ascii=False))
+        elif args.command == 'books':
             catalog = read(ROOT / 'assets/book-catalog.json')
             if args.out:
                 write(args.out, catalog)
@@ -314,6 +405,8 @@ def main():
             print(json.dumps(dict(entries=len(result['entries']), needs_semantic_review=True)))
         elif args.command == 'builtin':
             cfg = settings(dict(version=args.version))
+            if cfg['version'] == '用户材料':
+                raise ValueError('builtin仅用于小学、初中、高中；用户材料请先识别或导入。')
             vocab = dictionary(cfg['version'])
             items = vocab['entries']
             if args.limit is not None:
@@ -343,24 +436,14 @@ def main():
         else:
             plan = read(args.input) if args.command == 'reprint' else make_plan(read(args.input))
             mode = args.mode or plan['settings']['output_mode']
-            if mode == 'periods':
-                if args.days or plan['settings'].get('days'):
-                    raise ValueError('分期必须使用完整计划；选定天数请用combined或daily')
-                from batch_export import export_periods
-                files = export_periods(plan, args.out, args.period_days, args.remainder_first,
-                                       args.include_memory, args.title)
-            else:
-                files = export(plan, args.out, args.days, mode)
-                if args.include_memory and mode != 'memory':
-                    from print_layout import memory_document
-                    target = Path(args.out)/'单词总版记忆表.docx'
-                    memory_document(plan, target)
-                    files.append(str(target))
-            if args.zip:
-                from batch_export import zip_output
-                files.append(zip_output(args.out, files))
-            print(json.dumps(dict(files=files, statistics=plan['statistics'], settings=plan['settings']), ensure_ascii=False))
-    except (ValueError, KeyError, ImportError) as error:
+            args.include_memory = args.include_memory or plan['settings'].get('include_memory', False)
+            files = build_transaction(plan, args, mode)
+            print(json.dumps(dict(files=files, statistics=plan['statistics'], settings=plan['settings'],
+                                  estimate=estimate(plan, mode, select_days(plan, args.days), args.include_memory)), ensure_ascii=False))
+    except ModuleNotFoundError as error:
+        package = {'docx': 'python-docx', 'pypdf': 'pypdf', 'openpyxl': 'openpyxl'}.get(error.name, error.name)
+        parser.exit(2, '当前Python环境缺少依赖：%s。请先运行doctor查看解释器及安装建议；尚未生成完整成品。\n' % package)
+    except (ValueError, KeyError, ImportError, OSError) as error:
         parser.exit(2, str(error) + '\n')
 
 

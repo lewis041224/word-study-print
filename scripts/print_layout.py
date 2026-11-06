@@ -101,6 +101,7 @@ def practice_document(plan, days, target, header='背单词练习'):
     entries = plan['entries']
     learned_on = {i: day['day'] for day in plan['days'] for i in day['new']}
     started = False
+    per_page = plan['settings'].get('words_per_page', 20)
     for day in days:
         ids = day['entries']
         for mode, title, left, right in ((0, '中英对照', '英文', '中文'),
@@ -108,11 +109,11 @@ def practice_document(plan, days, target, header='背单词练习'):
                                         (2, '英译中', '英文', '中文')):
             paragraph(doc, f"第{day['day']}天 {title}", new_page=started)
             paragraph(doc, day_summary(day, learned_on), 'Normal', small=True)
-            for offset in range(0, len(ids), 20):
+            for offset in range(0, len(ids), per_page):
                 if offset:
                     paragraph(doc, f"第{day['day']}天 {title} 续", new_page=True)
                 rows = [(left + f" · 第{day['day']}天", right + ' · ' + title)]
-                for i in ids[offset:offset+20]:
+                for i in ids[offset:offset+per_page]:
                     entry = entries[i]
                     en, zh = entry['word'], chinese(entry)
                     pos = entry.get('pos', '') if plan['settings'].get('translation_pos_hint', True) else ''
@@ -126,6 +127,8 @@ def practice_document(plan, days, target, header='背单词练习'):
 
 def memory_document(plan, target, title='单词总版记忆表'):
     doc = new_document(title)
-    paragraph(doc, title, 'Title')
-    table(doc, [('英文', '中文')] + [(e['word'], chinese(e)) for e in plan['entries']], memory=True)
+    per_page = plan['settings'].get('words_per_page', 20)
+    for offset in range(0, len(plan['entries']), per_page):
+        paragraph(doc, title if not offset else title + ' 续', 'Title', new_page=bool(offset))
+        table(doc, [('英文', '中文')] + [(e['word'], chinese(e)) for e in plan['entries'][offset:offset+per_page]], memory=True)
     doc.save(target)
